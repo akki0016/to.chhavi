@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magical Wish Card</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffcce6, #ff99cc, #ff66b2);
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            z-index: -1;
+            background: linear-gradient(45deg, #ff66b2, #ff99cc, #ffcce6, #ff99cc, #ff66b2);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            filter: blur(20px);
+            opacity: 0.7;
+        }
+        
+        h1 {
+            color: #ff66b2;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: titleAnimation 3s ease infinite;
+        }
+        
+        .message {
+            color: #333;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .signature {
+            font-style: italic;
+            color: #ff66b2;
+            font-weight: bold;
+            margin-top: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .sparkle {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            filter: blur(1px);
+            animation: sparkle 2s linear forwards;
+        }
+        
+        .big-sparkle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #fff, 0 0 40px #fff;
+            animation: bigSparkle 3s infinite;
+            pointer-events: none;
+        }
+        
+        .heart {
+            color: #ff66b2;
+            font-size: 1.5rem;
+            display: inline-block;
+            margin: 0 5px;
+            animation: pulse 1.5s infinite;
+            text-shadow: 0 0 10px rgba(255, 102, 178, 0.7);
+        }
+        
+        .hearts-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .floating-heart {
+            position: absolute;
+            font-size: 1.8rem;
+            color: #ff66b2;
+            opacity: 0.7;
+            animation: float 6s ease-in infinite;
+            pointer-events: none;
+        }
+        
+        .flower {
+            position: absolute;
+            font-size: 2rem;
+            color: #ff66b2;
+            opacity: 0;
+            animation: floatFlower 8s ease-in infinite;
+            pointer-events: none;
+        }
+        
+        .decoration {
+            font-size: 2.2rem;
+            margin: 15px 0;
+            color: #ff66b2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: decorationAnimation 4s ease infinite;
+        }
+        
+        .btn {
+            background: #ff66b2;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 102, 178, 0.4);
+        }
+        
+        .btn:hover {
+            background: #ff3385;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 102, 178, 0.6);
+        }
+        
+        .message-container {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px dashed #ff99cc;
+            animation: messageFloat 6s ease-in-out infinite;
+        }
+        
+        /* Animations */
+        @keyframes sparkle {
+            0% {
+                transform: translate(0, 0) scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+                transform: translate(var(--tx), var(--ty)) scale(1) rotate(180deg);
+            }
+            100% {
+                transform: translate(calc(var(--tx) * 1.5), calc(var(--ty) * 1.5)) scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes bigSparkle {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes floatFlower {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.9;
+            }
+            80% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes titleAnimation {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes decorationAnimation {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        @keyframes messageFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .message {
+                font-size: 1.1rem;
+            }
+            
+            .card {
+                padding: 20px 15px;
+            }
+            
+            .decoration {
+                font-size: 1.8rem;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+
+        /* ✅ Mobile optimization */
+    @media (max-width: 600px) {
+      .container {
+        max-width: 90%;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .message {
+        font-size: 1.05rem;
+      }
+      .card {
+        padding: 20px 15px;
+      }
+      .decoration {
+        font-size: 1.6rem;
+      }
+      .btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+      }
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>For a cutie </h1>
+            <div class="decoration">✨ 🌸 💖 🦄 🌸 ✨</div>
+            
+            <div class="message-container">
+                <p class="message">
+                ✨ Hey you! ✨
+                All the best, cutie! 🌸📝
+I know you’ve worked hard,
+and I believe in you more than you know. 💖
+Just stay calm, do your best,
+Wishing you all the luck, focus, and confidence for your exam!
+You've got that brilliant brain and a beautiful heart — a perfect combo for success.!
+                </p>
+                <p class="message">
+                    You are amazing just the way you are. Never forget how special you are to this world!
+                </p>
+            </div>
+            
+            <div class="decoration">💕 🦄 ✨ 🌸 💕</div>
+            
+            <p class="signature">“With lots of care 💕and support ❤” <span class="heart">❤</span></p>
+           
+            <button class="btn" id="moreSparklesBtn">
+                <i class="fas fa-magic"></i> Extra Magic!
+            </button>
+        </div>
+    </div>
+
+    <div class="hearts-container" id="heartsContainer"></div>
+
+    <script>
+    // Create sparkles
+    function createSparkle() {
+        const sparkle = document.createElement('div');
+        sparkle.classList.add('sparkle');
+        
+        const size = Math.random() * 5 + 3;
+        sparkle.style.width = `${size}px`;
+        sparkle.style.height = `${size}px`;
+        
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+        sparkle.style.left = `${x}px`;
+        sparkle.style.top = `${y}px`;
+        
+        const tx = (Math.random() - 0.5) * 100;
+        const ty = (Math.random() - 0.5) * 100;
+        sparkle.style.setProperty('--tx', `${tx}px`);
+        sparkle.style.setProperty('--ty', `${ty}px`);
+        
+        sparkle.style.animationDelay = `${Math.random() * 2}s`;
+        
+        document.body.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 2000);
+    }
+
+    // Create big sparkles
+    function createBigSparkle() {
+        const bigSparkle = document.createElement('div');
+        bigSparkle.classList.add('big-sparkle');
+        
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+        bigSparkle.style.left = `${x}px`;
+        bigSparkle.style.top = `${y}px`;
+        
+        bigSparkle.style.animationDelay = `${Math.random() * 3}s`;
+        
+        document.body.appendChild(bigSparkle);
+        setTimeout(() => bigSparkle.remove(), 3000);
+    }
+
+    // Create floating hearts
+    function createFloatingHeart() {
+        const heart = document.createElement('div');
+        heart.classList.add('floating-heart');
+        heart.innerHTML = '❤';
+        
+        const x = Math.random() * window.innerWidth;
+        heart.style.left = `${x}px`;
+        
+        const size = Math.random() * 1.5 + 1;
+        heart.style.fontSize = `${size}rem`;
+        
+        const duration = Math.random() * 5 + 5;
+        heart.style.animationDuration = `${duration}s`;
+        heart.style.animationDelay = `${Math.random() * 2}s`;
+        
+        document.getElementById('heartsContainer').appendChild(heart);
+        setTimeout(() => heart.remove(), duration * 1000);
+    }
+
+    // Create floating flowers
+    function createFloatingFlower() {
+        const flower = document.createElement('div');
+        flower.classList.add('flower');
+        
+        const flowers = ['🌸', '🌹', '🌺', '🌻', '🌷', '💐', '🥀', '🌼'];
+        flower.innerHTML = flowers[Math.floor(Math.random() * flowers.length)];
+        
+        const x = Math.random() * window.innerWidth;
+        flower.style.left = `${x}px`;
+        
+        const size = Math.random() * 1.5 + 1.2;
+        flower.style.fontSize = `${size}rem`;
+        
+        const duration = Math.random() * 6 + 6;
+        flower.style.animationDuration = `${duration}s`;
+        flower.style.animationDelay = `${Math.random() * 3}s`;
+        
+        document.getElementById('heartsContainer').appendChild(flower);
+        setTimeout(() => flower.remove(), duration * 1000);
+    }
+        
+        // Create multiple sparkles
+        function generateSparkles() {
+            // Generate more sparkles on mobile devices
+            const isMobile = window.innerWidth <= 600;
+            const sparkleCount = isMobile ? 50 : 40;
+            const bigSparkleCount = isMobile ? 10 : 8;
+            
+            for (let i = 0; i < sparkleCount; i++) {
+                setTimeout(createSparkle, i * 40);
+            }
+            
+            for (let i = 0; i < bigSparkleCount; i++) {
+                setTimeout(createBigSparkle, i * 150);
+            }
+        }
+        
+        // Create multiple hearts and flowers
+        function generateHeartsAndFlowers() {
+            // Generate more on mobile devices
+            const isMobile = window.innerWidth <= 600;
+            const heartCount = isMobile ? 20 : 15;
+            const flowerCount = isMobile ? 15 : 10;
+            
+            for (let i = 0; i < heartCount; i++) {
+                setTimeout(createFloatingHeart, i * 200);
+            }
+            
+            for (let i = 0; i < flowerCount; i++) {
+                setTimeout(createFloatingFlower, i * 250);
+            }
+        }
+        
+        // Initial sparkles, hearts and flowers - more on mobile
+        window.addEventListener('load', function() {
+            const isMobile = window.innerWidth <= 600;
+            const initialSparkles = isMobile ? 120 : 80;
+            const initialHearts = isMobile ? 25 : 15;
+            const initialFlowers = isMobile ? 20 : 12;
+            
+            // Create initial sparkles
+            for (let i = 0; i < initialSparkles; i++) {
+                setTimeout(createSparkle, i * 25);
+            }
+            
+            for (let i = 0; i < (initialSparkles/8); i++) {
+                setTimeout(createBigSparkle, i * 80);
+            }
+            
+            // Create initial hearts
+            for (let i = 0; i < initialHearts; i++) {
+                setTimeout(createFloatingHeart, i * 150);
+            }
+            
+            // Create initial flowers
+            for (let i = 0; i < initialFlowers; i++) {
+                setTimeout(createFloatingFlower, i * 180);
+            }
+        });
+        
+        // Continue generating sparkles and hearts/flowers periodically
+    setInterval(generateSparkles, 2000);
+    setInterval(generateHeartsAndFlowers, 3500);
+
+    // Add interactive sparkles on click/touch
+    document.addEventListener('click', (e) => {
+        for (let i = 0; i < 25; i++) {
+            setTimeout(() => {
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+                
+                const size = Math.random() * 5 + 3;
+                sparkle.style.width = `${size}px`;
+                sparkle.style.height = `${size}px`;
+                
+                sparkle.style.left = `${e.clientX}px`;
+                sparkle.style.top = `${e.clientY}px`;
+                
+                const tx = (Math.random() - 0.5) * 100;
+                const ty = (Math.random() - 0.5) * 100;
+                sparkle.style.setProperty('--tx', `${tx}px`);
+                sparkle.style.setProperty('--ty', `${ty}px`);
+                
+                document.body.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 2000);
+            }, i * 80);
+        }
+        
+        // Also create a heart at the click point
+        const heart = document.createElement('div');
+        heart.classList.add('floating-heart');
+        heart.innerHTML = '❤';
+        heart.style.left = `${e.clientX}px`;
+        heart.style.top = `${e.clientY}px`;
+        heart.style.fontSize = '2rem';
+        heart.style.animationDuration = '5s';
+        document.getElementById('heartsContainer').appendChild(heart);
+        
+        setTimeout(() => {
+            heart.remove();
+        }, 5000);
+    });
+
+        
+        // More sparkles button
+        document.getElementById('moreSparklesBtn').addEventListener('click', function() {
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    createSparkle();
+                    if (i % 5 === 0) createBigSparkle();
+                    if (i % 8 === 0) createFloatingHeart();
+                    if (i % 10 === 0) createFloatingFlower();
+                }, i * 40);
+            }
+            
+            // Button animation
+            this.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 200);
+        });
+        
+        // Touch events for mobile devices
+document.addEventListener('touchmove', (e) => {
+    const touch = e.touches[0];
+    
+    // Create sparkles on touch move
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            
+            const size = Math.random() * 4 + 2;
+            sparkle.style.width = `${size}px`;
+            sparkle.style.height = `${size}px`;
+            
+            sparkle.style.left = `${touch.clientX}px`;
+            sparkle.style.top = `${touch.clientY}px`;
+            
+            const tx = (Math.random() - 0.5) * 20;
+            const ty = (Math.random() - 0.5) * 20;
+            sparkle.style.setProperty('--tx', `${tx}px`);
+            sparkle.style.setProperty('--ty', `${ty}px`);
+            
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => {
+                sparkle.remove();
+            }, 2000);
+        }, i * 50);
+    }
+});
+
+    </script>
+</body>
+</html>
